@@ -30,7 +30,7 @@ export interface BlockchainTransaction {
 
 export interface RiskAnalysis {
   riskScore: number;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'SEVERE';
+  riskLevel: "LOW" | "MEDIUM" | "HIGH" | "SEVERE";
   flags: string[];
   summary: string;
   details: {
@@ -87,16 +87,14 @@ export interface AnalysisResponse {
 
 // Additional types for better type safety
 export interface AddressRiskData {
+  [key: string]: unknown; // 👈 Add this line
+
   address: string;
-  level: 'LOW' | 'MEDIUM' | 'HIGH' | 'SEVERE';
+  level: "LOW" | "MEDIUM" | "HIGH" | "SEVERE";
   riskScore: number;
   associateBlackAddresses: string;
   interactionTime: string;
   amount: string;
-  maliciousAddressList?: Array<{
-    category: string;
-    value: string;
-  }>;
 }
 
 export interface BitcoinTransactionInput {

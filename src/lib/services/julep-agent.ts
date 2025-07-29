@@ -1,5 +1,5 @@
-import Julep from '@julep/sdk';
-import { BlockchainTransaction, AgentAnalysis, JulepAgent } from '@/types';
+import Julep from "@julep/sdk";
+import { BlockchainTransaction, AgentAnalysis, JulepAgent } from "@/types";
 
 interface JulepAgentData {
   id: string;
@@ -13,6 +13,8 @@ interface JulepAgentData {
   }>;
 }
 
+
+
 export class JulepAgentService {
   private client: Julep;
   private agent: JulepAgentData | null = null;
@@ -21,12 +23,12 @@ export class JulepAgentService {
     const apiKey = process.env.JULEP_API_KEY;
 
     if (!apiKey) {
-      throw new Error('JULEP_API_KEY environment variable is required');
+      throw new Error("JULEP_API_KEY environment variable is required");
     }
 
     this.client = new Julep({
       apiKey,
-      environment: 'production' // Use 'dev' for development
+      environment: "production", // Use 'dev' for development
     });
   }
 
@@ -36,7 +38,8 @@ export class JulepAgentService {
       this.agent = await this.client.agents.create({
         name: "TraceIQ-BlockchainAnalyst",
         model: "gpt-4o-mini",
-        about: "A specialized AI agent for analyzing blockchain transactions and identifying suspicious activities, money laundering patterns, and compliance risks.",
+        about:
+          "A specialized AI agent for analyzing blockchain transactions and identifying suspicious activities, money laundering patterns, and compliance risks.",
         instructions: [
           "You are TraceIQ, an expert blockchain transaction analyst specializing in cryptocurrency forensics and compliance.",
           "Analyze blockchain transactions for suspicious patterns, money laundering indicators, and compliance risks.",
@@ -45,16 +48,16 @@ export class JulepAgentService {
           "Always provide a risk score from 0-100 and classify risk levels as LOW, MEDIUM, HIGH, or SEVERE.",
           "Generate clear, professional summaries suitable for compliance teams and law enforcement.",
           "When analyzing transaction paths, identify all intermediate addresses and their risk profiles.",
-          "Flag any connections to known criminal entities, darknet markets, or sanctioned jurisdictions."
+          "Flag any connections to known criminal entities, darknet markets, or sanctioned jurisdictions.",
         ],
         default_settings: {
-          temperature: 0.3
-        }
+          temperature: 0.3,
+        },
       });
 
-      console.log('Julep agent initialized:', this.agent.id);
+      console.log("Julep agent initialized:", this.agent.id);
     } catch (error) {
-      console.error('Error initializing Julep agent:', error);
+      console.error("Error initializing Julep agent:", error);
       throw error;
     }
   }
@@ -72,7 +75,7 @@ export class JulepAgentService {
       // Create a session for this analysis
       const session = await this.client.sessions.create({
         agent: this.agent!.id,
-        situation: `Analyzing blockchain transaction ${transaction.hash} on ${transaction.network} network for compliance and risk assessment.`
+        situation: `Analyzing blockchain transaction ${transaction.hash} on ${transaction.network} network for compliance and risk assessment.`,
       });
 
       // Prepare the analysis prompt
@@ -84,7 +87,9 @@ export class JulepAgentService {
         - Network: ${transaction.network}
         - From: ${transaction.from}
         - To: ${transaction.to}
-        - Value: ${transaction.value} ${transaction.network === 'bitcoin' ? 'BTC' : 'ETH'}
+        - Value: ${transaction.value} ${
+        transaction.network === "bitcoin" ? "BTC" : "ETH"
+      }
         - Block: ${transaction.blockNumber}
         - Status: ${transaction.status}
         - Gas Used: ${transaction.gasUsed}
@@ -126,49 +131,49 @@ export class JulepAgentService {
 
       // Send message to agent
       await this.client.sessions.messages.create(session.id, {
-        role: 'user',
-        content: analysisPrompt
+        role: "user",
+        content: analysisPrompt,
       });
 
       // Get agent response
       const messages = await this.client.sessions.messages.list(session.id, {
         limit: 1,
-        order: 'desc'
+        order: "desc",
       });
 
       const agentResponse = messages.items[0];
-      
+
       let analysisResult;
       try {
         // Try to parse JSON from the response
-        const responseText = Array.isArray(agentResponse.content) ? 
-          agentResponse.content[0]?.text || agentResponse.content[0] : 
-          agentResponse.content;
-        
+        const responseText = Array.isArray(agentResponse.content)
+          ? agentResponse.content[0]?.text || agentResponse.content[0]
+          : agentResponse.content;
+
         analysisResult = JSON.parse(responseText as string);
       } catch {
         // Fallback if JSON parsing fails
-        const responseText = Array.isArray(agentResponse.content) ? 
-          agentResponse.content[0]?.text || agentResponse.content[0] : 
-          agentResponse.content;
+        const responseText = Array.isArray(agentResponse.content)
+          ? agentResponse.content[0]?.text || agentResponse.content[0]
+          : agentResponse.content;
 
         analysisResult = {
           riskScore: 50,
-          riskLevel: 'MEDIUM',
-          flags: ['Analysis parsing error'],
+          riskLevel: "MEDIUM",
+          flags: ["Analysis parsing error"],
           summary: responseText,
           details: {
             mixerDetected: false,
             sanctionedAddresses: false,
             highRiskExchange: false,
-            suspiciousPattern: false
+            suspiciousPattern: false,
           },
           aiSummary: responseText,
           pathAnalysis: {
             totalHops: pathData.length,
             mixersDetected: [],
-            exchangesInvolved: []
-          }
+            exchangesInvolved: [],
+          },
         };
       }
 
@@ -181,75 +186,77 @@ export class JulepAgentService {
           from: transaction.from,
           to: transaction.to,
           value: transaction.value,
-          token: transaction.network === 'bitcoin' ? 'BTC' : 'ETH',
+          token: transaction.network === "bitcoin" ? "BTC" : "ETH",
           summary: analysisResult.summary,
           hash: transaction.hash,
           blockNumber: transaction.blockNumber,
           timestamp: transaction.timestamp,
           gasUsed: transaction.gasUsed,
           gasPrice: transaction.gasPrice,
-          network: transaction.network
+          network: transaction.network,
         },
         riskAnalysis: {
           riskScore: analysisResult.riskScore,
           riskLevel: analysisResult.riskLevel,
           flags: analysisResult.flags,
           summary: analysisResult.summary,
-          details: analysisResult.details
+          details: analysisResult.details,
         },
         pathTracing: {
           hops: pathData.map((tx, index) => ({
-            from: (tx.from as string) || 'Unknown',
-            to: (tx.to as string) || 'Unknown',
-            value: (tx.value as string) || '0',
+            from: (tx.from as string) || "Unknown",
+            to: (tx.to as string) || "Unknown",
+            value: (tx.value as string) || "0",
             timestamp: (tx.timestamp as number) || Date.now(),
-            riskScore: Math.max(0, analysisResult.riskScore - (index * 10))
+            riskScore: Math.max(0, analysisResult.riskScore - index * 10),
           })),
           totalHops: pathData.length,
           mixersDetected: analysisResult.pathAnalysis?.mixersDetected || [],
-          exchangesInvolved: analysisResult.pathAnalysis?.exchangesInvolved || []
+          exchangesInvolved:
+            analysisResult.pathAnalysis?.exchangesInvolved || [],
         },
-        aiSummary: analysisResult.aiSummary
+        aiSummary: analysisResult.aiSummary,
       };
 
       return analysis;
     } catch (error) {
-      console.error('Error analyzing transaction with Julep agent:', error);
-      
+      console.error("Error analyzing transaction with Julep agent:", error);
+
       // Return fallback analysis
       return {
         transactionData: {
           from: transaction.from,
           to: transaction.to,
           value: transaction.value,
-          token: transaction.network === 'bitcoin' ? 'BTC' : 'ETH',
-          summary: 'Analysis failed - using fallback data',
+          token: transaction.network === "bitcoin" ? "BTC" : "ETH",
+          summary: "Analysis failed - using fallback data",
           hash: transaction.hash,
           blockNumber: transaction.blockNumber,
           timestamp: transaction.timestamp,
           gasUsed: transaction.gasUsed,
           gasPrice: transaction.gasPrice,
-          network: transaction.network
+          network: transaction.network,
         },
         riskAnalysis: {
           riskScore: 0,
-          riskLevel: 'LOW',
-          flags: ['Analysis service unavailable'],
-          summary: 'Unable to complete risk analysis due to service error',
+          riskLevel: "LOW",
+          flags: ["Analysis service unavailable"],
+          summary: "Unable to complete risk analysis due to service error",
           details: {
             mixerDetected: false,
             sanctionedAddresses: false,
             highRiskExchange: false,
-            suspiciousPattern: false
-          }
+            suspiciousPattern: false,
+          },
         },
         pathTracing: {
           hops: [],
           totalHops: 0,
           mixersDetected: [],
-          exchangesInvolved: []
+          exchangesInvolved: [],
         },
-        aiSummary: 'Transaction analysis service is currently unavailable. Please try again later.'
+        aiSummary:
+          "Transaction analysis service is currently unavailable. Please try again later.",
       };
     }
   }
@@ -265,10 +272,10 @@ export class JulepAgentService {
         name: this.agent!.name,
         model: this.agent!.model,
         instructions: this.agent!.instructions,
-        tools: this.agent!.tools || []
+        tools: this.agent!.tools || [],
       };
     } catch (error) {
-      console.error('Error getting agent info:', error);
+      console.error("Error getting agent info:", error);
       return null;
     }
   }

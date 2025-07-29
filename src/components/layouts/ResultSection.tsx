@@ -135,7 +135,7 @@ export const ResultSection = ({ visible, data }: ResultSectionProps) => {
       case "LOW":
         return "text-green-600 bg-green-100";
       default:
-        return "text-gray-600 bg-gray-100";
+        return "text-black bg-gray-100";
     }
   };
 
@@ -341,11 +341,9 @@ export const ResultSection = ({ visible, data }: ResultSectionProps) => {
                 )}
                 {data.riskLevel && (
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-600">
-                      Risk Level:
-                    </span>
+                    <span className="font-medium text-black">Risk Level:</span>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${getRiskColor(
+                      className={`px-2 py-1 rounded-full text-xs text-black font-semibold ${getRiskColor(
                         data.riskLevel
                       )}`}
                     >
@@ -355,7 +353,7 @@ export const ResultSection = ({ visible, data }: ResultSectionProps) => {
                 )}
                 {data.flags && data.flags.length > 0 && (
                   <div>
-                    <span className="font-medium text-gray-600 block mb-2">
+                    <span className="font-medium text-black block mb-2">
                       Risk Flags:
                     </span>
                     <div className="flex flex-wrap gap-1">
@@ -378,7 +376,7 @@ export const ResultSection = ({ visible, data }: ResultSectionProps) => {
               <h3 className="text-lg font-semibold text-gray-800 mb-3">
                 🧠 AI Agent Summary
               </h3>
-              <p className="text-gray-700 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed text-black">
                 {data.aiSummary || data.summary}
               </p>
             </div>
