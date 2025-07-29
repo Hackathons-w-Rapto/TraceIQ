@@ -135,7 +135,7 @@ export const TransactionInput = ({
       />
 
       {isLoading && (
-        <div className="mt-4 text-center text-gray-600">
+        <div className="mt-4 text-center text-black">
           <div className="inline-flex items-center">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
             Analyzing transaction...
