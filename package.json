@@ -9,9 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@julep/sdk": "^2.7.2",
     "@tabler/icons-react": "^3.34.1",
     "@xyflow/react": "^12.8.2",
+    "axios": "^1.11.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.1",
+    "ethers": "^6.15.0",
     "jspdf": "^3.0.1",
     "motion": "^12.23.11",
     "next": "15.4.4",
